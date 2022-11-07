@@ -7,8 +7,6 @@ import secrets
 N = 16
 
 
-
-
 r = redis.Redis(host='localhost', port=6379, db=0)
 q = Queue(connection=r)
 app = Flask(__name__)
@@ -33,12 +31,14 @@ def add_task():
             cookie_key = request.cookies.get('cookie_id')
             if cookie_key == None:
                 cookie_key = str(''.join(secrets.choice(string.ascii_uppercase + string.digits)
-                                     for i in range(N)))
+                                         for i in range(N)))
             jobs = q.jobs
             q_length = len(q)
-            r.hset(cookie_key,url,job_ids)
+            r.hset(cookie_key, url, job_ids)
             message = f"The result is {task} and the jobs queued are {q_length}"
             resp.set_cookie("cookie_id", cookie_key)
+            resp = make_response(render_template(
+                "add_task.html", message=message, jobs=jobs))
     return resp
 
 
@@ -46,7 +46,7 @@ def add_task():
 def get_result():
     final_dict = dict()
     cookie_key = request.cookies.get('cookie_id')
-    if cookie_key==None:
+    if cookie_key == None:
         return "Enter the Url first in /add_task"
     middle_dict = r.hgetall(cookie_key)
     for keys in middle_dict.keys():
