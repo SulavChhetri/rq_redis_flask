@@ -25,7 +25,7 @@ def add_task():
         if url:
             task = q.enqueue(count_words,url)
             job_ids = task.key[7:]
-            r.hset('key_container',url,job_ids)
+            r.hset('key_new',url,job_ids)
             jobs = q.jobs
             q_length = len(q)
             message = f"The result is {task} and the jobs queued are {q_length}"
@@ -33,12 +33,17 @@ def add_task():
 
 @app.route('/getresult')
 def get_result():
-    middle_dict = r.hgetall('key_container')
+    middle_dict = r.hgetall('key_new')
     for keys in middle_dict.keys():
         job_id =middle_dict[keys]
         job_id = middle_dict[keys].decode()
         result_data = q.fetch_job(job_id)
-        final_dict[keys.decode()]=result_data.result
+        if result_data is None:
+            result = None
+            final_dict[keys.decode()]=result
+            break
+        result = result_data.result
+        final_dict[keys.decode()]=result
     return render_template("scraperesult.html",result = final_dict)
 
 if __name__ == "__main__":
