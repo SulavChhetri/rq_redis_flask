@@ -53,6 +53,8 @@ def get_result():
         job_id = middle_dict[keys]
         job_id = middle_dict[keys].decode()
         result_data = q.fetch_job(job_id)
+        print(result_data)
+        print(result_data.result)
         if result_data is None:
             result = None
             final_dict[keys.decode()] = result

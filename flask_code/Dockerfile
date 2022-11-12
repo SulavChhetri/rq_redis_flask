@@ -5,7 +5,6 @@ LABEL Maintainer="sulavthapa"
 WORKDIR /src
 
 RUN pip install flask
-RUN pip install redis
 RUN pip install requests
 RUN pip install rq
 

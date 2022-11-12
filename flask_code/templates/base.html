@@ -15,10 +15,11 @@
 
 <body>
   <nav class="navbar navbar-expand-md navbar-light bg-light">
-      <a class="navbar-brand" href="{{ url_for('add_task')}}">Enter Url </a>
+      <a class="navbar-brand" href="{{ url_for('add_task')}}">Add Task </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span></button>
+      <a class="navbar-brand" href="{{ url_for('get_result')}}">Get Result </a>
   </nav>
   <div class="container">
     {% block content %} {% endblock %}
