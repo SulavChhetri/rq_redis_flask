@@ -21,14 +21,12 @@ def index():
 def add_task():
     jobs = q.jobs
     message = None
-    resp = make_response(render_template(
-        "add_task.html", message=message, jobs=jobs))
     if request.method == "POST":
         url = request.form['url']
         if url:
             task = q.enqueue(count_words, url)
             job_ids = task.id
-            cookie_key = request.cookies.get('cookie_id')
+            cookie_key = request.cookies.get('cookieid')
             if cookie_key == None:
                 cookie_key = str(''.join(secrets.choice(string.ascii_uppercase + string.digits)
                                          for i in range(N)))
@@ -36,16 +34,18 @@ def add_task():
             q_length = len(q)
             r.hset(cookie_key, url, job_ids)
             message = f"The result is {task} and the jobs queued are {q_length}"
-            resp.set_cookie("cookie_id", cookie_key)
             resp = make_response(render_template(
                 "add_task.html", message=message, jobs=jobs))
-    return resp
+            resp.set_cookie("cookieid", cookie_key)
+            return resp
+    return render_template(
+        "add_task.html", message=message, jobs=jobs)
 
 
 @app.route('/getresult')
 def get_result():
     final_dict = dict()
-    cookie_key = request.cookies.get('cookie_id')
+    cookie_key = request.cookies.get('cookieid')
     if cookie_key == None:
         return "Enter the Url first in /add_task"
     middle_dict = r.hgetall(cookie_key)
@@ -53,8 +53,6 @@ def get_result():
         job_id = middle_dict[keys]
         job_id = middle_dict[keys].decode()
         result_data = q.fetch_job(job_id)
-        print(result_data)
-        print(result_data.result)
         if result_data is None:
             result = None
             final_dict[keys.decode()] = result
@@ -65,4 +63,4 @@ def get_result():
 
 
 if __name__ == "__main__":
-    app.run(debug=True,host= '0.0.0.0',port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)
