@@ -14,5 +14,5 @@
     - name: Run docker-compose up
       become: true
       shell:
-        cmd: "docker-compose up"
+        cmd: "docker-compose up -d"
         chdir: /home/rq_redis_flask/
