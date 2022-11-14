@@ -3,7 +3,7 @@
   vars:
     pip_install_packages:
       - name: docker
-  pre_tasks:
+  tasks:
     - name: Install python3-pip
         shell: |
           sudo apt update
