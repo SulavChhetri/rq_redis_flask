@@ -20,6 +20,9 @@ def index():
 def hello_world():
     return "Hello World!!!!"
 
+@app.route('/sulav')
+def sulav_me():
+    render_template('sulav.html')
 
 @app.route('/add_task', methods=('GET', 'POST'))
 def add_task():
