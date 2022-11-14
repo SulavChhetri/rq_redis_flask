@@ -22,7 +22,7 @@ def hello_world():
 
 @app.route('/sulav')
 def sulav_me():
-    render_template('sulav.html')
+    return render_template('sulav.html')
 
 @app.route('/add_task', methods=('GET', 'POST'))
 def add_task():
