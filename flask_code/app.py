@@ -5,6 +5,10 @@ from rq import Queue
 import string
 import secrets
 N = 16
+# import os
+# from pathlib import Path
+# ROOT = Path(__file__).parent.parent
+# template_dir = os.path.join(ROOT,'flask_code','templates')
 
 
 r = redis.Redis(host='redis')
