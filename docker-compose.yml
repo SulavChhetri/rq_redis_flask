@@ -17,8 +17,6 @@ services:
   restart: on-failure
   environment:
    - ENVIRO
-   - PYTHONUNBUFFERED=1
-   - REDIS_PASSWORD
    - GITHUB_ACCESS_TOKEN
   
  redis:
