@@ -25,7 +25,6 @@ services:
   image: "redis:alpine"
   ports:
    - '6379:6379' 
-  command: /bin/sh -c "redis-server --requirepass ${REDIS_PASSWORD}"
   environment:
    - REDIS_PASSWORD
  worker:
