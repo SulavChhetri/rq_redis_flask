@@ -25,8 +25,6 @@ services:
   image: "redis:alpine"
   ports:
    - '6379:6379' 
-  volumes:
-   - redisdata:/data
   command: /bin/sh -c "redis-server --requirepass ${REDIS_PASSWORD}"
   environment:
    - REDIS_PASSWORD
@@ -36,6 +34,3 @@ services:
     entrypoint: rq worker --url=redis://redis:6379
     depends_on:
       - redis
-  
-volumes:
-  redisdata:
