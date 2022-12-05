@@ -3,6 +3,15 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+sulav.yml
+
+
+
+
+
+
+
 # C extensions
 *.so
 venv/

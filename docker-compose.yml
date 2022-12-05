@@ -1,54 +1,30 @@
-# version: '3.9'
-# services:
-#  streamer: &python
-#   build:
-#    context: ./flask_code
-#    dockerfile: Dockerfile
-#    target: $ENVIRO
-#    args:
-#     - GITHUB_ACCESS_TOKEN
-#   command: bash -c "python app.py"
-#   ports:
-#     - '5000:5000'
-#   volumes:
-#    - ./flask_code:/src
-#   depends_on:
-#    - redis
-#   restart: on-failure
-#   environment:
-#    - ENVIRO
-#    - GITHUB_ACCESS_TOKEN
-  
-#  redis:
-#   image: "redis:alpine"
-#   ports:
-#    - '6379:6379' 
-#  worker:
-#     build:
-#       context: ./flask_code
-#     entrypoint: rq worker --url=redis://redis:6379
-#     depends_on:
-#       - redis
-
-
-version: '3.9'
 services:
-  flask:
-    build: ./flask_code
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./flask_code:/src
-    depends_on:
-      - redis
-  redis:
-    image: redis
-    ports:
-      - "6379:6379"
-  worker:
+ streamer: &python
+  build:
+   context: ./flask_code
+   dockerfile: Dockerfile
+   target: $ENVIRO
+   args:
+    - GITHUB_ACCESS_TOKEN
+  command: bash -c "python app.py"
+  ports:
+    - '5000:5000'
+  volumes:
+   - ./flask_code:/src
+  depends_on:
+   - redis
+  restart: on-failure
+  environment:
+   - ENVIRO
+   - GITHUB_ACCESS_TOKEN
+  
+ redis:
+  image: "redis:alpine"
+  ports:
+   - '6379:6379' 
+ worker:
     build:
       context: ./flask_code
     entrypoint: rq worker --url=redis://redis:6379
     depends_on:
       - redis
-      - flask
