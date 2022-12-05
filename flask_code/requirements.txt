@@ -1,4 +1,3 @@
 requests
 flask
 rq
-git+ssh://git@github.com/ankamala/stdlink.git
