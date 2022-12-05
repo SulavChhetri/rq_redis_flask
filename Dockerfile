@@ -14,5 +14,3 @@ RUN pip install -e .
 
 FROM base as dev
 RUN pip install -e .[develop]
-
-CMD [ "python3 app.py" ]
