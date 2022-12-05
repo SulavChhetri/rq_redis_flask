@@ -1,16 +1,13 @@
-FROM python:3.8-buster as base
+FROM python:alpine
+
+LABEL Maintainer="sulavthapa"
+
 WORKDIR /src
 
-ARG GITHUB_ACCESS_TOKEN
-RUN git config --global url."https://${GITHUB_ACCESS_TOKEN}@github.com".insteadOf "ssh://git@github.com"
+RUN pip install flask
+RUN pip install requests
+RUN pip install rq
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY . .
 
-COPY setup.py .
-
-FROM base as prod
-RUN pip install -e .
-
-FROM base as dev
-RUN pip install -e .[develop]
+CMD ["python3","app.py"]
