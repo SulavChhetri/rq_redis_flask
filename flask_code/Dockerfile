@@ -7,6 +7,9 @@ RUN git config --global url."https://${GITHUB_ACCESS_TOKEN}@github.com".insteadO
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
+COPY requirements-in-house.txt .
+RUN pip install -r requirements-in-house.txt
+
 COPY setup.py .
 
 FROM base as prod
