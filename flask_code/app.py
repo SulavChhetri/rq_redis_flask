@@ -1,10 +1,11 @@
-from flask import Flask,render_template,request,make_response,jsonify
+from flask import Flask, render_template, request, make_response, jsonify
 import redis
 from tasks import count_words
 from rq import Queue
 import string
+import functools
 import secrets
-from stdlink import location,phone,url,mail,download
+from stdlink import location, phone, url, mail, download
 
 N = 16
 
@@ -12,29 +13,38 @@ r = redis.Redis(host='redis')
 q = Queue(connection=r)
 app = Flask(__name__)
 
+@functools.lru_cache() 
+def init_email():
+    download.download_user_data()
+    return mail.EmailParser(user=True)
+
 
 def input_error():
     return jsonify({
-            "status": "fail",
-            "data": {"input":"A input queries not properly given"}
-            })
+        "error": {
+            "code": 404,
+            "message": "A input queries not properly given"}
+    })
+
+
 def success_return(data):
     return jsonify({
-                "status": "sucess",
-                "data": data,
-                "message": "sucessfully communicated with flask app"
-                })
+        "data": data,
+    })
+
+
 def error_return(e):
-    return jsonify(
-        {
-        "status": "Error",
-        "data": None,
-        "message": f"Error {e} has occurred"
-        }
-    )
+    return jsonify({
+        "error": {
+            "code": 404,
+            "message": f"Error {e} has occured", }
+    })
+
+
 @app.route('/')
 def index():
     return render_template('base.html')
+
 
 @app.route('/api/phone/')
 def api_phone():
@@ -43,7 +53,7 @@ def api_phone():
         return input_error()
     country_code = request.args.get("country_code")
     try:
-        final_data = phone.extract_phonenumber(input_,country_code)
+        final_data = phone.extract_phonenumber(input_, country_code)
         return success_return(final_data)
     except Exception as e:
         return error_return(e)
@@ -116,7 +126,7 @@ def api_country_zip():
         return input_error()
     try:
         final_data = location.extract_us_zip(input_)
-        return success_return(final_data)                  
+        return success_return(final_data)
     except Exception as e:
         return error_return(e)
 
@@ -140,7 +150,7 @@ def api_url_clean_appstore():
     if not input_ or not host:
         return input_error()
     try:
-        final_data = url.extract_urls_from_text(input_,host)
+        final_data = url.extract_urls_from_text(input_, host)
         return success_return(final_data)
     except Exception as e:
         return error_return(e)
@@ -153,7 +163,7 @@ def api_url_get_host_meta():
         return input_error()
     email = request.args.get("email")
     try:
-        final_data = url.get_host_meta(input_,email)
+        final_data = url.get_host_meta(input_, email)
         return success_return(final_data)
     except Exception as e:
         return error_return(e)
@@ -170,28 +180,24 @@ def api_url_clean():
     except Exception as e:
         return error_return(e)
 
+
 @app.route('/api/email/')
 def api_email():
     input_ = request.args.get("input")
-    user_bool = request.args.get("user") if request.args.get("user") else False
     if not input_:
         return input_error()
-    if user_bool:
-        cookie_key = request.cookies.get('email_cookie')
-        if not cookie_key:
-            download.download_user_data()
     try:
-        email = mail.EmailParser(user=user_bool)
-        final_data = email.extract_emails(text = input_)
-        resp = make_response(success_return(final_data))
-        resp.set_cookie("email_cookie",'user_cookie')
-        return resp
+        email = init_email()
+        final_data = email.extract_emails(text=input_)
+        return success_return(final_data)
     except Exception as e:
         return error_return(e)
+
 
 @app.route('/sulav')
 def sulav_me():
     return render_template('sulav.html')
+
 
 @app.route('/add_task', methods=('GET', 'POST'))
 def add_task():

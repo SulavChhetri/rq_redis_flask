@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+
+-user_lookup_mini.zip
+-user_lookup.zip
+
+
 # C extensions
 *.so
 venv/
