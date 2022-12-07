@@ -23,7 +23,7 @@ def input_error():
     return jsonify({
         "error": {
             "code": 404,
-            "message": "A input queries not properly given"}
+            "message": "Input params not properly given"}
     })
 
 
