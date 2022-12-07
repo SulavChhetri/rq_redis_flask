@@ -1,28 +1,193 @@
-from flask import Flask, render_template, request, make_response
+from flask import Flask,render_template,request,make_response,jsonify
 import redis
 from tasks import count_words
 from rq import Queue
 import string
 import secrets
-N = 16
-# import os
-# from pathlib import Path
-# ROOT = Path(__file__).parent.parent
-# template_dir = os.path.join(ROOT,'flask_code','templates')
+from stdlink import location,phone,url,mail,download
 
+N = 16
 
 r = redis.Redis(host='redis')
 q = Queue(connection=r)
 app = Flask(__name__)
 
 
+def input_error():
+    return jsonify({
+            "status": "fail",
+            "data": {"input":"A input queries not properly given"}
+            })
+def success_return(data):
+    return jsonify({
+                "status": "sucess",
+                "data": data,
+                "message": "sucessfully communicated with flask app"
+                })
+def error_return(e):
+    return jsonify(
+        {
+        "status": "Error",
+        "data": None,
+        "message": f"Error {e} has occurred"
+        }
+    )
 @app.route('/')
 def index():
     return render_template('base.html')
 
-@app.route('/helloworld')
-def hello_world():
-    return "Hello World!!!!"
+@app.route('/api/phone/')
+def api_phone():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    country_code = request.args.get("country_code")
+    try:
+        final_data = phone.extract_phonenumber(input_,country_code)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/phone/telephone/')
+def api_phone_telephone():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    try:
+        final_data = phone.extract_phonenumber_from_telephone(input_)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/phone/whatsapp/')
+def api_phone_whatsapp():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    try:
+        final_data = phone.extract_phonenumber_from_whatsapp(input_)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/phone/viber/')
+def api_phone_viber():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    try:
+        final_data = phone.extract_phonenumber_from_viber(input_)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/country/')
+def api_country():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    try:
+        final_data = location.extract_country(input_)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/country_code/')
+def api_country_code():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    try:
+        final_data = location.extract_country_code(input_)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/country_zip/')
+def api_country_zip():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    try:
+        final_data = location.extract_us_zip(input_)
+        return success_return(final_data)                  
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/url/extract/')
+def api_url_extract():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    try:
+        final_data = url.extract_urls_from_text(input_)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/url/clean/appstore/')
+def api_url_clean_appstore():
+    input_ = request.args.get("input")
+    host = request.args.get("host")
+    if not input_ or not host:
+        return input_error()
+    try:
+        final_data = url.extract_urls_from_text(input_,host)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/url/get_host_meta/')
+def api_url_get_host_meta():
+    input_ = request.args.get("input")
+    if not input_:
+        return input_error()
+    email = request.args.get("email")
+    try:
+        final_data = url.get_host_meta(input_,email)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+
+@app.route('/api/url/clean/')
+def api_url_clean():
+    input_ = request.args.getlist("input")
+    if not input_:
+        return input_error()
+    try:
+        final_data = url.clean_http_urls(input_)
+        return success_return(final_data)
+    except Exception as e:
+        return error_return(e)
+
+@app.route('/api/email/')
+def api_email():
+    input_ = request.args.get("input")
+    user_bool = request.args.get("user") if request.args.get("user") else False
+    if not input_:
+        return input_error()
+    if user_bool:
+        cookie_key = request.cookies.get('email_cookie')
+        if not cookie_key:
+            download.download_user_data()
+    try:
+        email = mail.EmailParser(user=user_bool)
+        final_data = email.extract_emails(text = input_)
+        resp = make_response(success_return(final_data))
+        resp.set_cookie("email_cookie",'user_cookie')
+        return resp
+    except Exception as e:
+        return error_return(e)
 
 @app.route('/sulav')
 def sulav_me():
