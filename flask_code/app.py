@@ -59,42 +59,6 @@ def api_phone():
         return error_return(e)
 
 
-@app.route('/api/phone/telephone/')
-def api_phone_telephone():
-    input_ = request.args.get("input")
-    if not input_:
-        return input_error()
-    try:
-        final_data = phone.extract_phonenumber_from_telephone(input_)
-        return success_return(final_data)
-    except Exception as e:
-        return error_return(e)
-
-
-@app.route('/api/phone/whatsapp/')
-def api_phone_whatsapp():
-    input_ = request.args.get("input")
-    if not input_:
-        return input_error()
-    try:
-        final_data = phone.extract_phonenumber_from_whatsapp(input_)
-        return success_return(final_data)
-    except Exception as e:
-        return error_return(e)
-
-
-@app.route('/api/phone/viber/')
-def api_phone_viber():
-    input_ = request.args.get("input")
-    if not input_:
-        return input_error()
-    try:
-        final_data = phone.extract_phonenumber_from_viber(input_)
-        return success_return(final_data)
-    except Exception as e:
-        return error_return(e)
-
-
 @app.route('/api/country/')
 def api_country():
     input_ = request.args.get("input")
@@ -151,19 +115,6 @@ def api_url_clean_appstore():
         return input_error()
     try:
         final_data = url.extract_urls_from_text(input_, host)
-        return success_return(final_data)
-    except Exception as e:
-        return error_return(e)
-
-
-@app.route('/api/url/get_host_meta/')
-def api_url_get_host_meta():
-    input_ = request.args.get("input")
-    if not input_:
-        return input_error()
-    email = request.args.get("email")
-    try:
-        final_data = url.get_host_meta(input_, email)
         return success_return(final_data)
     except Exception as e:
         return error_return(e)
